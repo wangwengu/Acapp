@@ -1,0 +1,57 @@
+.ac_game_menu {
+    width: 100%;
+    height: 100%;
+    background-image: url("/static/image/menu/background.gif");
+    /* 禁止左右上下拉伸 */
+    background-size: 100% 100%;
+    /* 禁止用户鼠标点选 */
+    user-select: none;
+}
+
+.ac_game_menu_field {
+    width: 20vw;
+    position: relative;
+    top: 40vh;
+    left: 19vw;
+}
+
+.ac_game_menu_field_item {
+    color: white;
+    height: 7vh;
+    width: 20vw;
+    font-size: 6vh;
+    /* 设置字体样式为斜体 */
+    font-style: italic;
+    padding: 2vh;
+    text-align: center;
+    background-color: rgba(39, 21, 28, 0.6);
+    border-radius: 10px;
+    /* 设置字体之间的间距 */
+    letter-spacing: 0.5vw;
+    /* 设置鼠标样式 接触到之后变成指针样式 */
+    cursor: pointer;
+}
+
+.ac_game_menu_field_item:hover {
+    /* 设置缩放效果 */
+    transform: scale(1.2);
+    /* 设置秒数 */
+    transition: 100ms;
+}
+
+.ac_game_playground {
+    width: 100%;
+    height: 100%;
+    /* 禁止用户选中 */
+    user-select: none;
+    /* 添加一层灰色背景 */
+    background-color: grey;
+}
+
+.ac_game_playground > canvas {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    /* 平移给定元素 */
+    transform: translate(-50%, -50%);
+}

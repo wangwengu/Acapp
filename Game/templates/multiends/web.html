@@ -1,0 +1,23 @@
+<!-- 加载 static 文件夹 -->
+{% load static %}
+<head>
+    <!-- 引入 jquery css 文件-->
+    <link rel="stylesheet" href="https://cdn.acwing.com/static/jquery-ui-dist/jquery-ui.min.css">
+    <!-- 引入 jquery js 文件 -->
+    <script src="https://cdn.acwing.com/static/jquery/js/jquery-3.3.1.min.js"></script>
+    <!-- 引入网站图标 -->
+    <link rel="icon" href="https://cdn.acwing.com/media/article/image/2021/12/17/1_be4c11ce5f-acapp.png">
+    <!-- 引入 css 文件 -->
+    <link rel="stylesheet" href="{% static 'css/game.css' %}">
+</head>
+<!-- 将 body 的外边框设置为 0px 更加美观 -->
+<body style="margin: 0px;">
+    <div id="ac_game_12345678"></div>
+    <!-- 模块化编程 -->
+    <script type="module">
+        import {AcGame} from "{% static 'js/dist/game.js' %}";
+        $(document).ready(function() { // 作用:希望在页面加载完，自动执行定义js代码
+            let ac_game = new AcGame("ac_game_12345678");
+        });
+    </script>
+</body>
