@@ -10,6 +10,7 @@ class AcGameObject {
     }
     start() {} // 仅在第一帧执行
     update() {} // 从第一帧之后的每一帧都执行
+    late_update() {} // 在每一帧的最后执行一次
     on_destory() {} // 临死之前应该做啥
     destory() { // 判处死刑
         this.on_destory(); // 临死之前满足你的要求
@@ -39,6 +40,12 @@ let AC_GAME_ANIMATION = function(timestamp) {
             // 执行第一帧之后的每一帧
             obj.update();
         }
+    }
+    // 遍历所有对象
+    for (let i = 0; i < AC_GAME_OBJECTS.length; i ++ ) {
+        let obj = AC_GAME_OBJECTS[i];
+        // 在每个对象每一帧的最后执行一次
+        obj.late_update();
     }
     // 更新时间戳
     last_timestamp = timestamp;

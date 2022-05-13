@@ -37,7 +37,13 @@ class AcGamePlayground {
             this.game_map.resize();
         }
     }
-    show() {
+    get_random_color() {
+        let colors = ["blue", "red", "pink", "grey", "green"];
+        // Math.random()返回(0, 1)的数字
+        // Math.floor()向下取整
+        return colors[Math.floor(Math.random() * 5)];
+    }
+    show(mode) {
         // 显示玩家界面
         this.$playground.show();
         // 获取玩家界面的宽度
@@ -46,15 +52,45 @@ class AcGamePlayground {
         this.height = this.$playground.height();
         // 将地图创建出来
         this.game_map = new GameMap(this);
+        // 当前模式
+        this.mode = mode;
+        // 当前的状态是等待模式
+        this.state = "waiting";
         // 调用resize()函数, 将宽高比设置为16:9
         this.resize();
+        // 创建分数板
+        this.score_board = new ScoreBoard(this);
         // 创建玩家列表
         this.players = [];
         // 将玩家插入玩家列表
         // 宽度存的是比例
         this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, "white", 0.2, "me"));
+        // 如果是单人模式, 则创建机器人
+        if (mode === "single mode") {
+            // 最后的属性要表明是机器人
+            for(let i = 0; i < 10; i ++ ) {
+                this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.2, "robot"));
+            }
+        }
     }
     hide() { // 隐藏玩家界面
+        // 如果还有玩家存在, 则进行删除
+        while (this.players && this.players.length > 0) {
+            this.players[0].destory();
+        }
+        // 如果还存在地图对象一并删掉,并将其置空
+        if (this.game_map) {
+            this.game_map.destory();
+            this.game_map = null;
+        }
+        // 如果还存在分数板对象一并删掉,并将其置空
+        if (this.score_board) {
+            this.score_board.destory();
+            this.score_board = null;
+        }
+        // 清空玩家html代码
+        this.$playground.empty();
+        // 隐藏玩家界面
         this.$playground.hide();
     }
 }

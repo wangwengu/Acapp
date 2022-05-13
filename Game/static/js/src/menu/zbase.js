@@ -34,7 +34,7 @@ class AcGameMenu {
         // 点击单人模式时, 触发此函数
         this.$single_mode.click(function() {
             outer.hide(); // 隐藏菜单界面
-            outer.root.playground.show(); // 显示玩家界面
+            outer.root.playground.show("single mode"); // 显示玩家界面
         });
     }
     show() { // 显示菜单界面
