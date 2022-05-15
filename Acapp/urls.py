@@ -15,8 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import url # 导入url
+from django.views.generic.base import RedirectView # 导入重定向函数
 
 urlpatterns = [
+    # 当请求favicon.ico的时候, 重定向到图片的位置即可
+    url(r'^favicon\.ico$',RedirectView.as_view(url=r'static/image/favicon.ico')),
     path('admin/', admin.site.urls),
     path('', include('Game.urls.index')), # 添加Game的Url路径
 ]
