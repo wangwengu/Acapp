@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 # 导入getinfo函数
 from Game.views.settings.getinfo import getinfo
 # 导入signin函数
@@ -17,4 +17,6 @@ urlpatterns = [
     path('logout/', signout, name='settings_logout'),
     # 添加register路径
     path('register/', register, name='settings_register'),
+    # 添加acwing的路径
+    path('acwing/', include('Game.urls.settings.acwing.index')),
 ]

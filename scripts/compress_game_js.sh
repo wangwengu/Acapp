@@ -11,3 +11,5 @@ find $JS_PATH_SRC -type f -name '*.js' | sort | xargs cat > ${JS_PATH_DIST}/game
 echo yes | python3 manage.py collectstatic
 # 启动uwsgi
 uwsgi --ini ${ROOT_PATH}/scripts/uwsgi.ini
+# 启动websocket
+daphne -b 0.0.0.0 -p 5015 Acapp.asgi:application

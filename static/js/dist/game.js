@@ -24,6 +24,8 @@ class AcGameMenu {
         this.hide();
         // 找到单人模式的权柄
         this.$single_mode = this.$menu.find('.ac_game_menu_field_item_single_mode');
+        // 找到多人模式的权柄
+        this.$multi_mode = this.$menu.find('.ac_game_menu_field_item_multi_mode');
         // 找到设置的权柄
         this.$settings = this.$menu.find('.ac_game_menu_field_item_settings');
         // 调用启动函数
@@ -39,6 +41,11 @@ class AcGameMenu {
         this.$single_mode.click(function() {
             outer.hide(); // 隐藏菜单界面
             outer.root.playground.show("single mode"); // 显示玩家界面
+        });
+        // 点击多人模式时, 触发此函数
+        this.$multi_mode.click(function() {
+            outer.hide(); // 隐藏菜单界面
+            outer.root.playground.show("multi mode"); // 显示玩家界面
         });
         // 点击退出
         this.$settings.click(function() {
@@ -1070,9 +1077,6 @@ class Settings {
         // 显示注册界面
         this.$register.show();
     }
-    getinfo_acapp() {
-
-    }
     getinfo_web() {
         let outer = this;
         $.ajax({
@@ -1099,6 +1103,57 @@ class Settings {
                 }
             }
         });
+    }
+    acapp_login(appid, redirect_uri, scope, state) {
+        let outer = this;
+        // 调用API
+        this.root.AcWingOS.api.oauth2.authorize(appid, redirect_uri, scope, state, function(resp) {
+            // 成功
+            if (resp.result === "success") {
+                // 获取用户名
+                outer.username = resp.username;
+                // 获取密码
+                outer.photo = resp.photo;
+                // 隐藏当前界面
+                outer.hide();
+                // 显示菜单界面
+                outer.root.menu.show();
+            }
+        });
+    }
+    getinfo_acapp() {
+        let outer = this;
+        $.ajax({
+            // 申请授权码的地址
+            url: "https://app2370.acapp.acwing.com.cn/settings/acwing/acapp/apply_code/",
+            type: "GET",
+            success: function(resp) {
+                // 成功
+                if (resp.result === "success") {
+                    let appid = resp.appid;
+                    let redirect_uri = resp.redirect_uri;
+                    let scope = resp.scope;
+                    let state = resp.state;
+                    // 登录
+                    outer.acapp_login(appid, redirect_uri, scope, state);
+                }
+            }
+        });
+    }
+    // acwing一键登录
+    acwing_login() {
+        $.ajax({
+            // 请求访问的地址
+            url: "https://app2370.acapp.acwing.com.cn/settings/acwing/web/apply_code",
+            type: "GET", // GET类型
+            success: function(resp) {
+                // 成功, 则跳转申请应用码的网址
+                // Location.replace()方法以给定的URL来替换当前的资源
+                if (resp.result === "success") {
+                    window.location.replace(resp.apply_code_url);
+                }
+            }
+        })
     }
     // 隐藏界面
     hide() {

@@ -24,6 +24,8 @@ class AcGameMenu {
         this.hide();
         // 找到单人模式的权柄
         this.$single_mode = this.$menu.find('.ac_game_menu_field_item_single_mode');
+        // 找到多人模式的权柄
+        this.$multi_mode = this.$menu.find('.ac_game_menu_field_item_multi_mode');
         // 找到设置的权柄
         this.$settings = this.$menu.find('.ac_game_menu_field_item_settings');
         // 调用启动函数
@@ -39,6 +41,11 @@ class AcGameMenu {
         this.$single_mode.click(function() {
             outer.hide(); // 隐藏菜单界面
             outer.root.playground.show("single mode"); // 显示玩家界面
+        });
+        // 点击多人模式时, 触发此函数
+        this.$multi_mode.click(function() {
+            outer.hide(); // 隐藏菜单界面
+            outer.root.playground.show("multi mode"); // 显示玩家界面
         });
         // 点击退出
         this.$settings.click(function() {
