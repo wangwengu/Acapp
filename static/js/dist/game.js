@@ -728,6 +728,15 @@ class FireBall extends AcGameObject {
         this.ctx.fill();
     }
 }
+class MultiPlayerSocket {
+    constructor(playground) {
+        this.playground = playground;
+        // 注意: 此地的路径一定要严格对应
+        // routing中的url是wss/multiplayer/
+        // 则这里必须严格一致, 缺个/都不行
+        this.ws = new WebSocket("wss://app2370.acapp.acwing.com.cn/wss/multiplayer/");
+    }
+}
 class AcGamePlayground {
     constructor(root) {
         this.root = root;
@@ -801,6 +810,9 @@ class AcGamePlayground {
             for(let i = 0; i < 5; i ++ ) {
                 this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.2, "robot"));
             }
+        } else if (mode === "multi mode") { // 如果是多人模式
+            // 创建对应的WebSocket类
+            this.mps = new MultiPlayerSocket(this);
         }
     }
     hide() { // 隐藏玩家界面

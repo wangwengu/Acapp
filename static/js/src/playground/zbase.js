@@ -71,6 +71,9 @@ class AcGamePlayground {
             for(let i = 0; i < 5; i ++ ) {
                 this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.2, "robot"));
             }
+        } else if (mode === "multi mode") { // 如果是多人模式
+            // 创建对应的WebSocket类
+            this.mps = new MultiPlayerSocket(this);
         }
     }
     hide() { // 隐藏玩家界面
