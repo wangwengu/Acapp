@@ -10,7 +10,7 @@ class AcGameMenu {
                     <br>
                     <div class="ac_game_menu_field_item ac_game_menu_field_item_multi_mode">
                         多人模式
-                    </div>  
+                    </div>
                     <br>
                     <div class="ac_game_menu_field_item ac_game_menu_field_item_settings">
                         退出
@@ -69,6 +69,19 @@ class AcGameObject {
         this.has_called_start = false;
         // 统计时间间隔
         this.timedelta = 0;
+        // 调用函数, 生成唯一身份证号
+        this.uuid = this.create_uuid();
+    }
+    // 创建唯一编号
+    create_uuid() {
+        let res = "";
+        // 随机生成8位字符串, 作为唯一身份认证
+        for (let i = 0; i < 8; i ++ ) {
+            // 生成0~10内的整数
+            let x = parseInt(Math.floor(Math.random() * 10));
+            res += x;
+        }
+        return res;
     }
     start() {} // 仅在第一帧执行
     update() {} // 从第一帧之后的每一帧都执行
@@ -248,6 +261,10 @@ class Player extends AcGameObject {
         if (this.playground.mode === "single mode" && this.playground.players.length > 1) {
             this.playground.state = "fighting";
         }
+        // 如果当前的模式是多人模式并且当前的玩家数量多于3个, 则将状态设置为战斗状态fighting
+        if (this.playground.mode === "multi mode" && this.playground.players.length >= 3) {
+            this.playground.state = "fighting";
+        }
         // 如果当前的角色是本人
         if (this.character === "me") {
             // 添加监听事件
@@ -282,6 +299,11 @@ class Player extends AcGameObject {
                 let ty = (e.clientY - rect.top) / outer.playground.scale;
                 // 移动
                 outer.move_to(tx, ty);
+                // 如果当前是多人模式, 则调用移动函数
+                if (outer.playground.mode === "multi mode") {
+                    // 调用发送移动的函数
+                    outer.playground.mps.send_move_to(tx, ty);
+                }
             }
             else if (e.which === 1) { // 点击左键
                 let tx = (e.clientX - rect.left) / outer.playground.scale;
@@ -735,6 +757,115 @@ class MultiPlayerSocket {
         // routing中的url是wss/multiplayer/
         // 则这里必须严格一致, 缺个/都不行
         this.ws = new WebSocket("wss://app2370.acapp.acwing.com.cn/wss/multiplayer/");
+        // 调用start函数
+        this.start();
+    }
+
+    start() {
+        // 调用receive()函数
+        this.receive();
+    }
+
+    receive() {
+        let outer = this;
+        // 当接收到服务器发送(send函数和group_send函数)来的消息之后, 自动触发此函数
+        this.ws.onmessage = function(e) {
+            // 解析json数据
+            let data = JSON.parse(e.data);
+            // 获取唯一身份证号uuid
+            let uuid = data.uuid;
+            // 如果uuid等于outer.uuid, 说明消息是自己发送的, 则直接返回即可, 不需要进行处理
+            if (uuid === outer.uuid) return false;
+            // 获取事件
+            let event = data.event;
+            // 如果是创建玩家的事件
+            if (event === "create_player") {
+                // 调用相关函数
+                outer.receive_create_player(uuid, data.username, data.photo);
+            }
+            // 如果是移动事件
+            else if (event === "move_to") {
+                // 调用移动函数
+                outer.receive_move_to(uuid, data.tx, data.ty);
+            }
+        };
+    }
+
+    // 向服务器发送创建玩家的相关消息
+    send_create_player(username, photo) {
+        // 获取外部权柄
+        let outer = this;
+        // 向服务器发送相关数据
+        this.ws.send(JSON.stringify({
+            // 表明当前是创建玩家事件
+            'event': "create_player",
+            // 当前玩家的唯一编号
+            'uuid': outer.uuid,
+            // 当前玩家的用户名
+            'username': username,
+            // 当前玩家的头像
+            'photo': photo,
+        }));
+    }
+
+    // 接收服务器发来的关于创建玩家的信息
+    receive_create_player(uuid, username, photo) {
+        // 创建新玩家
+        let player = new Player(
+            this.playground,
+            this.playground.width / 2 / this.playground.scale,
+            0.5,
+            0.05,
+            "white",
+            0.2,
+            "enemy", // 敌人
+            username, // 玩家的用户名
+            photo, // 玩家的头像
+        );
+        // 每创建一次对象, 都会产生新的uuid
+        // 因此, 我们需要更新玩家的uuid, 不使用新的, 继续使用旧的即可
+        player.uuid = uuid;
+        // 将当前玩家插入到玩家队列中去
+        this.playground.players.push(player);
+    }
+
+    // 根据uuid获取玩家信息
+    get_player(uuid) {
+        // 获取所有玩家
+        let players = this.playground.players;
+        // 遍历所有玩家
+        for (let i = 0; i < players.length; i ++ ) {
+            // 获取当前玩家
+            let player = players[i];
+            // 如果身份证号已经正确, 则返回当前玩家
+            if (player.uuid === uuid) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    // 向服务器发送玩家移动的信息
+    send_move_to(tx, ty) {
+        let outer = this;
+        // 向服务器的receive()函数发送信息
+        this.ws.send(JSON.stringify({
+            'event': "move_to", // 事件名称
+            'uuid': outer.uuid, // 身份证号
+            'tx': tx, // x坐标
+            'ty': ty, // y坐标
+        }));
+    }
+
+    // 接收玩家移动的事件
+    receive_move_to(uuid, tx, ty) {
+        // 获取当前玩家
+        let player = this.get_player(uuid);
+        // 如果当前玩家还存活, 则移动当前的玩家
+        if (player) {
+            // 调用移动函数
+            player.move_to(tx, ty);
+        }
     }
 }
 class AcGamePlayground {
@@ -783,6 +914,7 @@ class AcGamePlayground {
         return colors[Math.floor(Math.random() * 5)];
     }
     show(mode) {
+        let outer = this;
         // 显示玩家界面
         this.$playground.show();
         // 获取玩家界面的宽度
@@ -813,6 +945,13 @@ class AcGamePlayground {
         } else if (mode === "multi mode") { // 如果是多人模式
             // 创建对应的WebSocket类
             this.mps = new MultiPlayerSocket(this);
+            // 获取玩家的身份证号
+            this.mps.uuid = this.players[0].uuid;
+            // 当WebSocket连接成功之后, 自动触发此函数
+            this.mps.ws.onopen = function() {
+                // 调用发送创建玩家的函数, 传入用户名和密码
+                outer.mps.send_create_player(outer.root.settings.username, outer.root.settings.photo);
+            };
         }
     }
     hide() { // 隐藏玩家界面

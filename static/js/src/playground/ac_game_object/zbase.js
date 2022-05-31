@@ -7,6 +7,19 @@ class AcGameObject {
         this.has_called_start = false;
         // 统计时间间隔
         this.timedelta = 0;
+        // 调用函数, 生成唯一身份证号
+        this.uuid = this.create_uuid();
+    }
+    // 创建唯一编号
+    create_uuid() {
+        let res = "";
+        // 随机生成8位字符串, 作为唯一身份认证
+        for (let i = 0; i < 8; i ++ ) {
+            // 生成0~10内的整数
+            let x = parseInt(Math.floor(Math.random() * 10));
+            res += x;
+        }
+        return res;
     }
     start() {} // 仅在第一帧执行
     update() {} // 从第一帧之后的每一帧都执行

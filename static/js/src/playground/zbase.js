@@ -44,6 +44,8 @@ class AcGamePlayground {
         return colors[Math.floor(Math.random() * 5)];
     }
     show(mode) {
+        console.log(mode);
+        let outer = this;
         // 显示玩家界面
         this.$playground.show();
         // 获取玩家界面的宽度
@@ -74,6 +76,13 @@ class AcGamePlayground {
         } else if (mode === "multi mode") { // 如果是多人模式
             // 创建对应的WebSocket类
             this.mps = new MultiPlayerSocket(this);
+            // 获取玩家的身份证号
+            this.mps.uuid = this.players[0].uuid;
+            // 当WebSocket连接成功之后, 自动触发此函数
+            this.mps.ws.onopen = function() {
+                // 调用发送创建玩家的函数, 传入用户名和密码
+                outer.mps.send_create_player(outer.root.settings.username, outer.root.settings.photo);
+            };
         }
     }
     hide() { // 隐藏玩家界面

@@ -10,7 +10,7 @@ class AcGameMenu {
                     <br>
                     <div class="ac_game_menu_field_item ac_game_menu_field_item_multi_mode">
                         多人模式
-                    </div>  
+                    </div>
                     <br>
                     <div class="ac_game_menu_field_item ac_game_menu_field_item_settings">
                         退出

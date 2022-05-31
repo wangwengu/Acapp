@@ -43,6 +43,10 @@ class Player extends AcGameObject {
         if (this.playground.mode === "single mode" && this.playground.players.length > 1) {
             this.playground.state = "fighting";
         }
+        // 如果当前的模式是多人模式并且当前的玩家数量多于3个, 则将状态设置为战斗状态fighting
+        if (this.playground.mode === "multi mode" && this.playground.players.length >= 3) {
+            this.playground.state = "fighting";
+        }
         // 如果当前的角色是本人
         if (this.character === "me") {
             // 添加监听事件
@@ -77,6 +81,11 @@ class Player extends AcGameObject {
                 let ty = (e.clientY - rect.top) / outer.playground.scale;
                 // 移动
                 outer.move_to(tx, ty);
+                // 如果当前是多人模式, 则调用移动函数
+                if (outer.playground.mode === "multi mode") {
+                    // 调用发送移动的函数
+                    outer.playground.mps.send_move_to(tx, ty);
+                }
             }
             else if (e.which === 1) { // 点击左键
                 let tx = (e.clientX - rect.left) / outer.playground.scale;
